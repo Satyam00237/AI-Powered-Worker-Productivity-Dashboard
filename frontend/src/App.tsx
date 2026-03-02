@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Activity, RotateCcw, Monitor, Filter, Clock, Cpu, Zap, Box, Wifi, WifiOff } from 'lucide-react';
+import { Users, Activity, RotateCcw, Monitor, Filter, Clock, Cpu, Zap, Box, WifiOff } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { motion, AnimatePresence } from 'framer-motion';
