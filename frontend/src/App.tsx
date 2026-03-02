@@ -77,18 +77,18 @@ export default function App() {
     useEffect(() => {
         loadData();
 
-        function onConnect() {
-            setSocketConnected(true);
-        }
+        // function onConnect() {
+        //     setSocketConnected(true);
+        // }
 
-        function onDisconnect() {
-            setSocketConnected(false);
-        }
+        // function onDisconnect() {
+        //     setSocketConnected(false);
+        // }
 
-        function onNewEvent(value: any) {
-            console.log("New event received via Socket.IO:", value);
-            loadData();
-        }
+        // function onNewEvent(value: any) {
+        //     console.log("New event received via Socket.IO:", value);
+        //     loadData();
+        // }
 
         // socket.on('connect', onConnect);
         // socket.on('disconnect', onDisconnect);
