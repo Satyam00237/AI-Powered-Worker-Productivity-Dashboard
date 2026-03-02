@@ -6,8 +6,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 const API_URL = import.meta.env.VITE_API_URL;
 
-// const socket = io(API_URL);
+const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
 
+const socket = io(API_URL, {
+    autoConnect: !isVercel,
+    reconnectionAttempts: 3,
+    transports: ['websocket', 'polling']
+});
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
@@ -58,7 +63,7 @@ export default function App() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'workers' | 'workstations'>('workers');
     const [filterStr, setFilterStr] = useState('');
-    const [socketConnected, setSocketConnected] = useState(true);
+    const [socketConnected, setSocketConnected] = useState(socket.connected);
 
     const loadData = () => {
         setLoading(true);
@@ -77,28 +82,28 @@ export default function App() {
     useEffect(() => {
         loadData();
 
-        // function onConnect() {
-        //     setSocketConnected(true);
-        // }
+        function onConnect() {
+            setSocketConnected(true);
+        }
 
-        // function onDisconnect() {
-        //     setSocketConnected(false);
-        // }
+        function onDisconnect() {
+            setSocketConnected(false);
+        }
 
-        // function onNewEvent(value: any) {
-        //     console.log("New event received via Socket.IO:", value);
-        //     loadData();
-        // }
+        function onNewEvent(value: any) {
+            console.log("New event received via Socket.IO:", value);
+            loadData();
+        }
 
-        // socket.on('connect', onConnect);
-        // socket.on('disconnect', onDisconnect);
-        // socket.on('new_event', onNewEvent);
+        socket.on('connect', onConnect);
+        socket.on('disconnect', onDisconnect);
+        socket.on('new_event', onNewEvent);
 
-        // return () => {
-        //     socket.off('connect', onConnect);
-        //     socket.off('disconnect', onDisconnect);
-        //     socket.off('new_event', onNewEvent);
-        // };
+        return () => {
+            socket.off('connect', onConnect);
+            socket.off('disconnect', onDisconnect);
+            socket.off('new_event', onNewEvent);
+        };
     }, []);
 
     const handleSeed = () => {
