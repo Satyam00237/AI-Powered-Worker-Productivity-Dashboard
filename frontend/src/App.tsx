@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 const API_URL = import.meta.env.VITE_API_URL;
 
-const socket = io(API_URL);
+// const socket = io(API_URL);
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -58,7 +58,7 @@ export default function App() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'workers' | 'workstations'>('workers');
     const [filterStr, setFilterStr] = useState('');
-    const [socketConnected, setSocketConnected] = useState(socket.connected);
+    const [socketConnected, setSocketConnected] = useState(true);
 
     const loadData = () => {
         setLoading(true);
@@ -90,15 +90,15 @@ export default function App() {
             loadData();
         }
 
-        socket.on('connect', onConnect);
-        socket.on('disconnect', onDisconnect);
-        socket.on('new_event', onNewEvent);
+        // socket.on('connect', onConnect);
+        // socket.on('disconnect', onDisconnect);
+        // socket.on('new_event', onNewEvent);
 
-        return () => {
-            socket.off('connect', onConnect);
-            socket.off('disconnect', onDisconnect);
-            socket.off('new_event', onNewEvent);
-        };
+        // return () => {
+        //     socket.off('connect', onConnect);
+        //     socket.off('disconnect', onDisconnect);
+        //     socket.off('new_event', onNewEvent);
+        // };
     }, []);
 
     const handleSeed = () => {
