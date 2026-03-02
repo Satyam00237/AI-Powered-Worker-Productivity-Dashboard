@@ -4,8 +4,9 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
+const API_URL = import.meta.env.VITE_API_URL;
 
-const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000');
+const socket = io(API_URL);
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -62,9 +63,9 @@ export default function App() {
     const loadData = () => {
         setLoading(true);
         Promise.all([
-            fetch('/api/metrics/factory').then(r => r.json()),
-            fetch('/api/metrics/workers').then(r => r.json()),
-            fetch('/api/metrics/workstations').then(r => r.json()),
+            fetch(`${API_URL}/api/metrics/factory`).then(r => r.json()),
+            fetch(`${API_URL}/api/metrics/workers`).then(r => r.json()),
+            fetch(`${API_URL}/api/metrics/workstations`).then(r => r.json()),
         ]).then(([fData, wData, sData]) => {
             setFactory(fData);
             setWorkers(wData);
@@ -102,7 +103,7 @@ export default function App() {
 
     const handleSeed = () => {
         setLoading(true);
-        fetch('/api/seed', { method: 'POST' })
+        fetch(`${API_URL}/api/seed`, { method: 'POST' })
             .then(() => loadData());
     };
 

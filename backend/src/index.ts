@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
@@ -9,7 +11,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*", // Adjust this in production
+        origin: `${process.env.CLIENT_URL}`, // Adjust this in production
         methods: ["GET", "POST"]
     }
 });
@@ -94,7 +96,7 @@ app.get('/api/metrics/workstations', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 server.listen(PORT, async () => {
     await seedDb(); // Seed database on initial startup automatically
