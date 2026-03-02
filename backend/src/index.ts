@@ -17,6 +17,20 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+// Root health check route
+app.get('/', (req, res) => {
+    res.json({
+        status: 'ok',
+        message: 'AI Factory API is running',
+        endpoints: [
+            'GET /api/metrics/factory',
+            'GET /api/metrics/workers',
+            'POST /api/events',
+            'POST /api/seed'
+        ]
+    });
+});
+
 // Ingest an event
 app.post('/api/events', async (req, res) => {
     try {
