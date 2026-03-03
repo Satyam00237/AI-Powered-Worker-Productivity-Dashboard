@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 const API_URL = import.meta.env.VITE_API_URL;
 
-const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+const isVercelEnvironment = typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || (API_URL && API_URL.includes('vercel.app')));
 
-const socket = io(API_URL, {
-    autoConnect: !isVercel,
+const socket = io(API_URL || '', {
+    autoConnect: !isVercelEnvironment,
     reconnectionAttempts: 3,
     transports: ['websocket', 'polling']
 });
@@ -82,27 +82,42 @@ export default function App() {
     useEffect(() => {
         loadData();
 
-        function onConnect() {
+        let interval: any;
+
+        if (isVercelEnvironment) {
+            // Vercel Serverless environment: Fallback to HTTP polling
+            interval = setInterval(() => {
+                loadData();
+            }, 5000);
             setSocketConnected(true);
-        }
+        } else {
+            function onConnect() {
+                setSocketConnected(true);
+            }
 
-        function onDisconnect() {
-            setSocketConnected(false);
-        }
+            function onDisconnect() {
+                setSocketConnected(false);
+            }
 
-        function onNewEvent(value: any) {
-            console.log("New event received via Socket.IO:", value);
-            loadData();
-        }
+            function onNewEvent(value: any) {
+                console.log("New event received via Socket.IO:", value);
+                loadData();
+            }
 
-        socket.on('connect', onConnect);
-        socket.on('disconnect', onDisconnect);
-        socket.on('new_event', onNewEvent);
+            socket.on('connect', onConnect);
+            socket.on('disconnect', onDisconnect);
+            socket.on('new_event', onNewEvent);
+
+            if (!socket.connected && !isVercelEnvironment) {
+                socket.connect();
+            }
+        }
 
         return () => {
-            socket.off('connect', onConnect);
-            socket.off('disconnect', onDisconnect);
-            socket.off('new_event', onNewEvent);
+            if (interval) clearInterval(interval);
+            socket.off('connect');
+            socket.off('disconnect');
+            socket.off('new_event');
         };
     }, []);
 
