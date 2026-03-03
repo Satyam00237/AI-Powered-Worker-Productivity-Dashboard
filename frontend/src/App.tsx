@@ -68,13 +68,13 @@ export default function App() {
     const loadData = () => {
         setLoading(true);
         Promise.all([
-            fetch(`${API_URL}/api/metrics/factory`).then(r => r.json()),
-            fetch(`${API_URL}/api/metrics/workers`).then(r => r.json()),
-            fetch(`${API_URL}/api/metrics/workstations`).then(r => r.json()),
+            fetch(`${API_URL}/api/metrics/factory`).then(r => r.json()).catch(() => ({})),
+            fetch(`${API_URL}/api/metrics/workers`).then(r => r.json()).catch(() => []),
+            fetch(`${API_URL}/api/metrics/workstations`).then(r => r.json()).catch(() => []),
         ]).then(([fData, wData, sData]) => {
-            setFactory(fData);
-            setWorkers(wData);
-            setWorkstations(sData);
+            setFactory(fData.error ? null : fData);
+            setWorkers(Array.isArray(wData) ? wData : []);
+            setWorkstations(Array.isArray(sData) ? sData : []);
             setLoading(false);
         });
     };
