@@ -18,6 +18,12 @@ async function getDb() {
         driver: sqlite3_1.default.Database
     });
     await initDb(db);
+    // Auto-seed if database is completely empty (Crucial for Vercel Serverless /tmp)
+    const workerCount = await db.get('SELECT COUNT(*) as count FROM workers');
+    if (workerCount.count === 0) {
+        console.log("Database is empty. Auto-seeding...");
+        await seedData(db);
+    }
     return db;
 }
 async function initDb(db) {
@@ -47,6 +53,9 @@ async function initDb(db) {
 }
 async function seedDb() {
     const db = await getDb();
+    await seedData(db);
+}
+async function seedData(db) {
     // Clear existing data
     await db.exec(`
     DELETE FROM events;
